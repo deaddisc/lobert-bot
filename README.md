@@ -40,7 +40,8 @@ Deploy slash commands (guild-scoped, updates instantly)
 npm run deploy:cmd
 Start the bot
 npm run dev
-🎮 Usage
+
+## 🎮 Usage
 
 Create a lobby
 /lobby create game:Valorant size:5

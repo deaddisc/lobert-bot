@@ -43,36 +43,48 @@ npm run dev
 
 ## 🎮 Usage
 
-Create a lobby
+1. Create a lobby
 /lobby create game:Valorant size:5
 Lobert will post an embed:
 
+```embed
 VALORANT lobby (1/5)
 • @YourName (creator)
 [ Join ]  [ Leave ]
 Join / Leave
+```
 Click Join to add yourself to the roster.
 Click Leave to remove yourself.
-List open lobbies
+
+2. List open lobbies
 /lobby list
-Replies (ephemeral):
+
+```Replies (ephemeral):
 
 • VALORANT (2/5) – @YourName
 • League (1/3) – @AnotherUser
-Cancel your lobby
+```
+
+3. Cancel your lobby
 /lobby cancel
 Deletes the embed and removes your lobby.
-Lobby full ping
+
+4. Lobby full ping
 When the last spot is filled, Lobert automatically sends:
+
+```embed
 🚀 Lobby full! @A @B @C @D @E
 🛠️ Configuration & Deployment
+```
 
-Environment variables
+## Environment variables
 DISCORD_TOKEN — Your bot’s token from the Developer Portal.
 CLIENT_ID — The Application (Client) ID.
 GUILD_ID — The guild/server ID where you want instant command updates.
+
 Docker / PM2
 You can containerize or daemonize the bot for 24/7 uptime.
+
 Persistence
 Currently in-memory; for lobby persistence across restarts, integrate a database (e.g., SQLite or Redis).
 📄 License & Credits

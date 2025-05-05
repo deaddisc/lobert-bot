@@ -1,6 +1,6 @@
 # Lobert Bot
 
-A friendly Discord lobby manager that makes it easy to gather players for any game, right in your server. Lobert handles lobby creation, live join/leave buttons, roster updates, and “lobby full” pings so you can focus on playing, not coordinating.
+A Discord game lobby butler that makes it easy to gather players for any game, right in your server. Lobert handles lobby creation, live join/leave buttons, roster updates, and “lobby full” pings so you can focus on playing, not coordinating.
 
 ---
 

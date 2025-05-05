@@ -83,12 +83,12 @@ CLIENT_ID — The Application (Client) ID.
 GUILD_ID — The guild/server ID where you want instant command updates.
 
 Docker / PM2
-You can containerize or daemonize the bot for 24/7 uptime.
+You can deploy the bot on Render or Railway for 24/7 uptime.
 
 Persistence
 Currently in-memory; for lobby persistence across restarts, integrate a database (e.g., SQLite or Redis).
-📄 License & Credits
 
+📄 License & Credits
 Maintained by
 • Deaddisc / Neron
 • Aeris (ChatGPT)

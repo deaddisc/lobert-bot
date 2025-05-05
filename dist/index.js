@@ -45,103 +45,96 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-/* ------------------------------------------------------------------ */
-/* 0. Imports                                                          */
-/* ------------------------------------------------------------------ */
 const discord_js_1 = require("discord.js");
 const dotenv = __importStar(require("dotenv"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const LobbyManager_1 = require("./lib/LobbyManager");
-dotenv.config(); // loads DISCORD_TOKEN
+dotenv.config(); // loads DISCORD_TOKEN, CLIENT_ID, GUILD_ID
 /* ------------------------------------------------------------------ */
-/* 2. Instantiate client & load commands                               */
+/* 2. Instantiate client and commands collection                      */
 /* ------------------------------------------------------------------ */
-const client = new discord_js_1.Client({
-    intents: [discord_js_1.GatewayIntentBits.Guilds],
-});
+const client = new discord_js_1.Client({ intents: [discord_js_1.GatewayIntentBits.Guilds] });
 client.commands = new discord_js_1.Collection();
+/* ------------------------------------------------------------------ */
+/* 3. Load command modules (.js in production, .ts in dev)             */
+/* ------------------------------------------------------------------ */
 const commandsPath = node_path_1.default.join(__dirname, 'commands');
-for (const file of node_fs_1.default.readdirSync(commandsPath).filter((f) => f.endsWith('.ts'))) {
-    const { data, execute } = require(node_path_1.default.join(commandsPath, file));
-    client.commands.set(data.name, { data, execute });
+const commandFiles = node_fs_1.default
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
+for (const file of commandFiles) {
+    const command = require(node_path_1.default.join(commandsPath, file));
+    client.commands.set(command.data.name, command);
 }
 console.log('Loaded commands:', [...client.commands.keys()]);
 /* ------------------------------------------------------------------ */
-/* 3. Ready event                                                      */
+/* 4. Event handlers                                                   */
 /* ------------------------------------------------------------------ */
 client.once(discord_js_1.Events.ClientReady, (bot) => {
     console.log(`🤖 Logged in as ${bot.user.tag}`);
 });
-/* ------------------------------------------------------------------ */
-/* 4. Unified interaction handler                                      */
-/* ------------------------------------------------------------------ */
 client.on(discord_js_1.Events.InteractionCreate, (interaction) => __awaiter(void 0, void 0, void 0, function* () {
-    // ─── Buttons first ─────────────────────────────────────────────────
+    // Handle buttons
     if (interaction.isButton()) {
-        const btn = interaction;
-        try {
-            yield btn.deferUpdate(); // ACK within 3s
-            // Parse & fetch lobby
-            const [action, lobbyId] = btn.customId.split(':');
-            console.log(`Button ${action} on lobby ${lobbyId}`);
-            const lobby = LobbyManager_1.lobbyManager.get(lobbyId);
-            if (!lobby)
-                return;
-            // Join/Leave logic
-            if (action === 'join') {
-                if (!lobby.players.includes(btn.user.id) &&
-                    lobby.players.length < lobby.size) {
-                    lobby.players.push(btn.user.id);
-                }
-            }
-            else if (action === 'leave') {
-                lobby.players = lobby.players.filter((id) => id !== btn.user.id);
-            }
-            // Update the embed
-            const rawChannel = yield client.channels.fetch(lobby.channelId);
-            const channel = rawChannel;
-            const msg = yield channel.messages.fetch(lobby.id);
-            const embed = msg.embeds[0].toJSON();
-            embed.title = `${lobby.game.toUpperCase()} lobby (${lobby.players.length}/${lobby.size})`;
-            embed.description =
-                lobby.players.map((id) => `<@${id}>`).join('\n') || '*Empty*';
-            yield msg.edit({ embeds: [embed] });
-            // Ping when full
-            if (lobby.players.length === lobby.size) {
-                yield channel.send(`🚀 Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
-            }
-        }
-        catch (err) {
-            console.error('Button handler error:', err);
-        }
-        return; // done with button
+        yield handleButton(interaction);
+        return;
     }
-    // ─── Slash commands next ───────────────────────────────────────────
+    // Handle slash commands
     if (interaction.isChatInputCommand()) {
-        const slash = interaction;
-        const command = client.commands.get(slash.commandName);
+        const command = client.commands.get(interaction.commandName);
         if (!command)
             return;
         try {
-            yield command.execute(slash);
+            yield command.execute(interaction);
         }
-        catch (err) {
-            console.error('Slash handler error:', err);
-            const replyOpts = {
-                content: '💥 Something went wrong.',
-                ephemeral: true,
-            };
-            if (slash.deferred || slash.replied) {
-                yield slash.followUp(replyOpts);
+        catch (error) {
+            console.error('Command execution error:', error);
+            if (interaction.deferred || interaction.replied) {
+                yield interaction.followUp({ content: '💥 Something went wrong.', ephemeral: true });
             }
             else {
-                yield slash.reply(replyOpts);
+                yield interaction.reply({ content: '💥 Something went wrong.', ephemeral: true });
             }
         }
     }
 }));
+function handleButton(interaction) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield interaction.deferUpdate();
+            const [action, lobbyId] = interaction.customId.split(':');
+            const lobby = LobbyManager_1.lobbyManager.get(lobbyId);
+            if (!lobby)
+                return;
+            if (action === 'join') {
+                if (!lobby.players.includes(interaction.user.id) && lobby.players.length < lobby.size) {
+                    lobby.players.push(interaction.user.id);
+                }
+            }
+            else if (action === 'leave') {
+                lobby.players = lobby.players.filter((id) => id !== interaction.user.id);
+            }
+            const channel = yield interaction.client.channels.fetch(lobby.channelId);
+            if (!(channel === null || channel === void 0 ? void 0 : channel.isTextBased()))
+                return;
+            const msg = yield channel.messages.fetch(lobby.id);
+            const embed = msg.embeds[0].toJSON();
+            embed.title = `${lobby.game.toUpperCase()} lobby (${lobby.players.length}/${lobby.size})`;
+            embed.description = lobby.players.map((id) => `<@${id}>`).join('\n') || '*Empty*';
+            yield msg.edit({ embeds: [embed] });
+            if (lobby.players.length === lobby.size && (channel === null || channel === void 0 ? void 0 : channel.isTextBased())) {
+                // Tell TS this is a TextBasedChannel so .send() is valid:
+                const textCh = channel;
+                yield textCh.send(`🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
+            }
+        }
+        catch (error) {
+            console.error('Button handler error:', error);
+        }
+    });
+}
 /* ------------------------------------------------------------------ */
-/* 5. Log in                                                           */
+/* 5. Login                                                           */
 /* ------------------------------------------------------------------ */
 client.login(process.env.DISCORD_TOKEN);

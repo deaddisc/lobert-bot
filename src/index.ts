@@ -5,6 +5,7 @@ import {
   GatewayIntentBits,
   ChatInputCommandInteraction,
   ButtonInteraction,
+  TextBasedChannel,
 } from 'discord.js';
 import * as dotenv from 'dotenv';
 import fs from 'node:fs';
@@ -100,8 +101,12 @@ async function handleButton(interaction: ButtonInteraction) {
     embed.description = lobby.players.map((id) => `<@${id}>`).join('\n') || '*Empty*';
     await msg.edit({ embeds: [embed] });
 
-    if (lobby.players.length === lobby.size) {
-      await channel.send(`🚀 Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
+    if (lobby.players.length === lobby.size && channel?.isTextBased()) {
+      // Tell TS this is a TextBasedChannel so .send() is valid:
+      const textCh = channel as TextBasedChannel;
+      await textCh.send(
+        `🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`
+      );
     }
   } catch (error) {
     console.error('Button handler error:', error);

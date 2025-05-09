@@ -92,3 +92,8 @@ Currently in-memory; for lobby persistence across restarts, integrate a database
 Maintained by
 • Deaddisc / Neron
 • Aeris (ChatGPT)
+
+---
+
+## Dev's To-do list of Features & Bug-fixes
+- Modify the /lobby list command so that it prints out all the opened lobbies' embed with the join/leave buttons instead ofj just a list. (People need to keep scrolling up to find the embed and click join/leave)

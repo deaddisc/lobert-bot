@@ -96,4 +96,4 @@ Maintained by
 ---
 
 ## Dev's To-do list of Features & Bug-fixes
-- Modify the /lobby list command so that it prints out all the opened lobbies' embed with the join/leave buttons instead ofj just a list. (People need to keep scrolling up to find the embed and click join/leave)
+- Modify the /lobby list command so that it publically(not just the "only you can see this" messages) prints out all the opened lobbies' embed with the join/leave buttons instead of just a list. (People need to keep scrolling up to find the embed and click join/leave)

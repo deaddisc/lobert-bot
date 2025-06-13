@@ -101,9 +101,7 @@ async function handleButton(interaction: ButtonInteraction) {
     await msg.edit({ embeds: [embed] });
 
     if (lobby.players.length === lobby.size && channel?.isTextBased()) {
-      // Tell TS this is a TextBasedChannel so .send() is valid:
-      const textCh = channel as TextBasedChannel;
-      await textCh.send(
+      await (channel as any).send(
         `🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`
       );
     }

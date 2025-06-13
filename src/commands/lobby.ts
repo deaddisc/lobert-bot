@@ -83,9 +83,23 @@ import {
       if (!open.length) {
         return interaction.reply({ content: 'No open lobbies.', ephemeral: true });
       }
-      const lines = open.map(l =>
-        `• **${l.game}**  (${l.players.length}/${l.size}) – <@${l.creatorId}>`);
-      await interaction.reply({ content: lines.join('\n'), ephemeral: true });
+
+      for (const [i, lobby] of open.entries()) {
+        const channel = await interaction.client.channels.fetch(lobby.channelId);
+        if (!channel?.isTextBased()) continue;
+        try {
+          const msg = await channel.messages.fetch(lobby.id);
+          const embed = msg.embeds[0];
+          const components = msg.components;
+          if (i === 0) {
+            await interaction.reply({ embeds: [embed], components });
+          } else {
+            await interaction.followUp({ embeds: [embed], components });
+          }
+        } catch {
+          /* message may be gone */
+        }
+      }
     }
   
     /* ──────────────── CANCEL ──────────────── */

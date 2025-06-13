@@ -124,9 +124,7 @@ function handleButton(interaction) {
             embed.description = lobby.players.map((id) => `<@${id}>`).join('\n') || '*Empty*';
             yield msg.edit({ embeds: [embed] });
             if (lobby.players.length === lobby.size && (channel === null || channel === void 0 ? void 0 : channel.isTextBased())) {
-                // Tell TS this is a TextBasedChannel so .send() is valid:
-                const textCh = channel;
-                yield textCh.send(`🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
+                yield channel.send(`🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
             }
         }
         catch (error) {

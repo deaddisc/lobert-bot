@@ -69,8 +69,25 @@ function execute(interaction) {
             if (!open.length) {
                 return interaction.reply({ content: 'No open lobbies.', ephemeral: true });
             }
-            const lines = open.map(l => `• **${l.game}**  (${l.players.length}/${l.size}) – <@${l.creatorId}>`);
-            yield interaction.reply({ content: lines.join('\n'), ephemeral: true });
+            for (const [i, lobby] of open.entries()) {
+                const channel = yield interaction.client.channels.fetch(lobby.channelId);
+                if (!(channel === null || channel === void 0 ? void 0 : channel.isTextBased()))
+                    continue;
+                try {
+                    const msg = yield channel.messages.fetch(lobby.id);
+                    const embed = msg.embeds[0];
+                    const components = msg.components;
+                    if (i === 0) {
+                        yield interaction.reply({ embeds: [embed], components });
+                    }
+                    else {
+                        yield interaction.followUp({ embeds: [embed], components });
+                    }
+                }
+                catch (_a) {
+                    /* message may be gone */
+                }
+            }
         }
         /* ──────────────── CANCEL ──────────────── */
         else if (sub === 'cancel') {

@@ -54,6 +54,7 @@ function execute(interaction) {
                 game,
                 size,
                 players: [interaction.user.id],
+                expiresAt: Date.now() + 3 * 60 * 60 * 1000,
             });
             /* --- replace temp IDs with the real message ID (TS‑safe casts) --- */
             const fixedRow = discord_js_1.ActionRowBuilder.from(tempRow);

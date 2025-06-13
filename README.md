@@ -15,8 +15,11 @@ A Discord game lobby butler that makes it easy to gather players for any game, r
   - **Join** / **Leave** buttons on each lobby embed for one-click roster management.  
   - Embed updates in real time as players join or leave.
 
-- **Auto-ping when full**  
+- **Auto-ping when full**
   - As soon as the player count reaches the lobby size, Lobert posts a “🚀 Lobby full!” message tagging everyone in that lobby.
+
+- **Auto-expire**
+  - Lobbies automatically close and their message is removed after 3 hours.
 
 - **Multi-lobby support**  
   - Handle multiple lobbies across different games (or the same game) simultaneously.

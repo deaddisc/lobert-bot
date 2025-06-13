@@ -28,7 +28,7 @@ interface LobertClient extends Client<boolean> {
 /* ------------------------------------------------------------------ */
 /* 2. Instantiate client and commands collection                      */
 /* ------------------------------------------------------------------ */
-const client = new Client({ intents: [GatewayIntentBits.Guilds] }) as LobertClient;
+export const client = new Client({ intents: [GatewayIntentBits.Guilds] }) as LobertClient;
 client.commands = new Collection<string, Command>();
 
 /* ------------------------------------------------------------------ */

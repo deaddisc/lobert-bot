@@ -5,7 +5,6 @@ import {
   GatewayIntentBits,
   ChatInputCommandInteraction,
   ButtonInteraction,
-  TextBasedChannel,
 } from 'discord.js';
 import * as dotenv from 'dotenv';
 import fs from 'node:fs';

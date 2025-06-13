@@ -45,6 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.client = void 0;
 const discord_js_1 = require("discord.js");
 const dotenv = __importStar(require("dotenv"));
 const node_fs_1 = __importDefault(require("node:fs"));
@@ -54,8 +55,8 @@ dotenv.config(); // loads DISCORD_TOKEN, CLIENT_ID, GUILD_ID
 /* ------------------------------------------------------------------ */
 /* 2. Instantiate client and commands collection                      */
 /* ------------------------------------------------------------------ */
-const client = new discord_js_1.Client({ intents: [discord_js_1.GatewayIntentBits.Guilds] });
-client.commands = new discord_js_1.Collection();
+exports.client = new discord_js_1.Client({ intents: [discord_js_1.GatewayIntentBits.Guilds] });
+exports.client.commands = new discord_js_1.Collection();
 /* ------------------------------------------------------------------ */
 /* 3. Load command modules (.js in production, .ts in dev)             */
 /* ------------------------------------------------------------------ */
@@ -65,16 +66,16 @@ const commandFiles = node_fs_1.default
     .filter((file) => file.endsWith('.js') || file.endsWith('.ts'));
 for (const file of commandFiles) {
     const command = require(node_path_1.default.join(commandsPath, file));
-    client.commands.set(command.data.name, command);
+    exports.client.commands.set(command.data.name, command);
 }
-console.log('Loaded commands:', [...client.commands.keys()]);
+console.log('Loaded commands:', [...exports.client.commands.keys()]);
 /* ------------------------------------------------------------------ */
 /* 4. Event handlers                                                   */
 /* ------------------------------------------------------------------ */
-client.once(discord_js_1.Events.ClientReady, (bot) => {
+exports.client.once(discord_js_1.Events.ClientReady, (bot) => {
     console.log(`🤖 Logged in as ${bot.user.tag}`);
 });
-client.on(discord_js_1.Events.InteractionCreate, (interaction) => __awaiter(void 0, void 0, void 0, function* () {
+exports.client.on(discord_js_1.Events.InteractionCreate, (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     // Handle buttons
     if (interaction.isButton()) {
         yield handleButton(interaction);
@@ -82,7 +83,7 @@ client.on(discord_js_1.Events.InteractionCreate, (interaction) => __awaiter(void
     }
     // Handle slash commands
     if (interaction.isChatInputCommand()) {
-        const command = client.commands.get(interaction.commandName);
+        const command = exports.client.commands.get(interaction.commandName);
         if (!command)
             return;
         try {
@@ -124,9 +125,7 @@ function handleButton(interaction) {
             embed.description = lobby.players.map((id) => `<@${id}>`).join('\n') || '*Empty*';
             yield msg.edit({ embeds: [embed] });
             if (lobby.players.length === lobby.size && (channel === null || channel === void 0 ? void 0 : channel.isTextBased())) {
-                // Tell TS this is a TextBasedChannel so .send() is valid:
-                const textCh = channel;
-                yield textCh.send(`🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
+                yield channel.send(`🚀  Lobby full! ${lobby.players.map((id) => `<@${id}>`).join(' ')}`);
             }
         }
         catch (error) {
@@ -137,4 +136,4 @@ function handleButton(interaction) {
 /* ------------------------------------------------------------------ */
 /* 5. Login                                                           */
 /* ------------------------------------------------------------------ */
-client.login(process.env.DISCORD_TOKEN);
+exports.client.login(process.env.DISCORD_TOKEN);

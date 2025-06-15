@@ -1,3 +1,5 @@
-# flyctl launch added from AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\terminal-suggest\.gitignore
-AppData\Local\Programs\Microsoft VS Code\resources\app\extensions\terminal-suggest\**\third_party
+node_modules
+.git
+.env
+*.log
 fly.toml

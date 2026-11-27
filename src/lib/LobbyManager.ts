@@ -27,19 +27,30 @@ export class LobbyManager {
     this.#lobbies.set(lobby.id, lobby);
     const timers: ReturnType<typeof setTimeout>[] = [];
     this.#timers.set(lobby.id, timers);
-    if (lobby.startsAt !== undefined) {
-      timers.push(setTimeout(() => {
-        if (this.get(lobby.id) !== lobby) return;
-        void this.actions.start(lobby).catch(error => console.error('Lobby start ping failed:', error));
-      }, Math.max(0, lobby.startsAt - Date.now())));
-    }
+    // One lifecycle timer prevents expiration from racing the start ping.
     timers.push(setTimeout(() => {
       if (this.get(lobby.id) !== lobby) return;
+      // Stop accepting joins and exclude this lobby from fresh lists immediately.
       this.delete(lobby.id);
-      void this.actions.expire(lobby).catch(error => console.error('Lobby expiration failed:', error));
-    }, Math.max(0, lobby.expiresAt - Date.now())));
+      void this.finish(lobby);
+    }, Math.max(0, (lobby.startsAt ?? lobby.expiresAt) - Date.now())));
   }
 
+  private async finish(lobby: Lobby) {
+    if (lobby.startsAt !== undefined) {
+      try {
+        await this.actions.start(lobby);
+      } catch (error) {
+        console.error('Lobby start ping failed:', error);
+      }
+    }
+    // Delete the original message after the ping attempt, even if sending failed.
+    try {
+      await this.actions.expire(lobby);
+    } catch (error) {
+      console.error('Lobby expiration failed:', error);
+    }
+  }
   get(id: string) { return this.#lobbies.get(id); }
 
   delete(id: string) {

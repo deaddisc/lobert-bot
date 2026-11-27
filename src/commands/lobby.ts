@@ -79,7 +79,7 @@ import {
         size,
         players: [interaction.user.id],
         startsAt,
-        expiresAt: (startsAt ?? Date.now()) + 3 * 60 * 60 * 1000,
+        expiresAt: startsAt ?? (Date.now() + 3 * 60 * 60 * 1000),
       });
 
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(

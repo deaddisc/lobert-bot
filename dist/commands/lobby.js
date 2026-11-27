@@ -75,7 +75,7 @@ function execute(interaction) {
                 size,
                 players: [interaction.user.id],
                 startsAt,
-                expiresAt: (startsAt !== null && startsAt !== void 0 ? startsAt : Date.now()) + 3 * 60 * 60 * 1000,
+                expiresAt: startsAt !== null && startsAt !== void 0 ? startsAt : (Date.now() + 3 * 60 * 60 * 1000),
             });
             const row = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder().setCustomId(`join:${msg.id}`).setLabel('Join').setStyle(discord_js_1.ButtonStyle.Primary), new discord_js_1.ButtonBuilder().setCustomId(`leave:${msg.id}`).setLabel('Leave').setStyle(discord_js_1.ButtonStyle.Secondary));
             yield msg.edit({ components: [row] });
